@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Memory Match Game</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #F5F0E8;
+      font-family: Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #app {
+      padding: 32px 20px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 600;
+      color: #3C3489;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      font-size: 15px;
+      color: #888780;
+      margin-bottom: 24px;
+    }
+
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-bottom: 24px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: #888780;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .stat-value {
+      font-size: 26px;
+      font-weight: 600;
+      color: #3C3489;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      max-width: 380px;
+      margin: 0 auto 24px;
+    }
+
+    .card {
+      aspect-ratio: 1;
+      border-radius: 12px;
+      cursor: pointer;
+      perspective: 600px;
+      transition: transform 0.1s;
+    }
+
+    .card:active { transform: scale(0.95); }
+
+    .card-inner {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.35s ease;
+      border-radius: 12px;
+    }
+
+    .card.flipped .card-inner { transform: rotateY(180deg); }
+
+    .card-front, .card-back {
+      position: absolute;
+      inset: 0;
+      border-radius: 12px;
+      backface-visibility: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-front {
+      background: #E8E0D0;
+      border: 1.5px solid #D3CFC4;
+      font-size: 22px;
+      color: #B4B2A9;
+      font-weight: 600;
+    }
+
+    .card-back {
+      background: #fff;
+      border: 1.5px solid #CCC;
+      font-size: 30px;
+      transform: rotateY(180deg);
+    }
+
+    .card.matched .card-back {
+      background: #EAF3DE;
+      border-color: #9FE1CB;
+    }
+
+    .card.matched .card-inner { transform: rotateY(180deg); }
+
+    button {
+      background: #3C3489;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 28px;
+      font-size: 15px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: opacity 0.15s;
+    }
+
+    button:hover { opacity: 0.85; }
+
+    .win-banner {
+      display: none;
+      background: #E1F5EE;
+      border: 1px solid #9FE1CB;
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 20px;
+      max-width: 380px;
+      margin-left: auto;
+      margin-right: auto;
+      color: #085041;
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .win-banner.show { display: block; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <h1>Memory Match</h1>
+    <p class="subtitle">Find all matching pairs</p>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-label">Moves</div>
+        <div class="stat-value" id="moves">0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Pairs</div>
+        <div class="stat-value" id="pairs">0 / 8</div>
+      </div>
+    </div>
+
+    <div class="win-banner" id="win-banner">🎉 You won! All pairs found!</div>
+
+    <div class="grid" id="grid"></div>
+
+    <button onclick="initGame()">New Game</button>
+  </div>
+
+  <script>
+    const EMOJIS = ['🍎', '🌸', '⭐', '🦋', '🍋', '🎈', '🐢', '🔮'];
+    let cards = [], flipped = [], matched = [], moves = 0, locked = false;
+
+    function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function initGame() {
+      cards = shuffle([...EMOJIS, ...EMOJIS]);
+      flipped = [];
+      matched = [];
+      moves = 0;
+      locked = false;
+      document.getElementById('moves').textContent = '0';
+      document.getElementById('pairs').textContent = '0 / 8';
+      document.getElementById('win-banner').classList.remove('show');
+      render();
+    }
+
+    function render() {
+      const grid = document.getElementById('grid');
+      grid.innerHTML = '';
+      cards.forEach((emoji, i) => {
+        const el = document.createElement('div');
+        el.className = 'card' +
+          (flipped.includes(i) || matched.includes(i) ? ' flipped' : '') +
+          (matched.includes(i) ? ' matched' : '');
+        el.innerHTML = `
+          <div class="card-inner">
+            <div class="card-front">?</div>
+            <div class="card-back">${emoji}</div>
+          </div>
+        `;
+        el.onclick = () => handleClick(i);
+        grid.appendChild(el);
+      });
+    }
+
+    function handleClick(i) {
+      if (locked || flipped.includes(i) || matched.includes(i)) return;
+      flipped.push(i);
+      render();
+      if (flipped.length === 2) {
+        moves++;
+        document.getElementById('moves').textContent = moves;
+        locked = true;
+        const [a, b] = flipped;
+        if (cards[a] === cards[b]) {
+          matched.push(a, b);
+          flipped = [];
+          locked = false;
+          document.getElementById('pairs').textContent = (matched.length / 2) + ' / 8';
+          render();
+          if (matched.length === cards.length) {
+            setTimeout(() => document.getElementById('win-banner').classList.add('show'), 300);
+          }
+        } else {
+          setTimeout(() => {
+            flipped = [];
+            locked = false;
+            render();
+          }, 900);
+        }
+      }
+    }
+
+    initGame();
+  </script>
+</body>
+</html>
