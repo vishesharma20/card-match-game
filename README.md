@@ -10,10 +10,10 @@ Match all 8 pairs to win!
 
 Project Structure
 memory-game
-index.html       ← The main HTML file (structure of the page)
-style.css        ← All the styling and colors
-script.js        ← All the game logic
-README.md        ← This file
+index.html ← The main HTML file (structure of the page)
+style.css ← All the styling and colors
+script.js ← All the game logic
+README.md ← This file
 Technologies Used
 
 HTML5
@@ -23,7 +23,7 @@ JavaScript (Vanilla)
 Live Demo
 Play the game here
 
-Replace the link above with your actual GitHub Pages link after deploying.
+https://vishesharma20.github.io/card-match-game/
 
 How to Run Locally
 
