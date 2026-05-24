@@ -9,8 +9,7 @@ If they don't match, they flip back
 Match all 8 pairs to win!
 
 Project Structure
-memory-game/
-│
+memory-game
 ├── index.html       ← The main HTML file (structure of the page)
 ├── style.css        ← All the styling and colors
 ├── script.js        ← All the game logic
