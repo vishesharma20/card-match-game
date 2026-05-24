@@ -10,10 +10,10 @@ Match all 8 pairs to win!
 
 Project Structure
 memory-game
-├── index.html       ← The main HTML file (structure of the page)
-├── style.css        ← All the styling and colors
-├── script.js        ← All the game logic
-└── README.md        ← This file
+index.html       ← The main HTML file (structure of the page)
+style.css        ← All the styling and colors
+script.js        ← All the game logic
+README.md        ← This file
 Technologies Used
 
 HTML5
@@ -29,7 +29,7 @@ How to Run Locally
 
 Download or clone this repository
 Open index.html in any browser
-That's it — no installation needed!
+That's it, no installation needed!
 
 Author
 Made by Vishesh Sharma
