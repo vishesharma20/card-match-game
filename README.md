@@ -1,6 +1,6 @@
 Memory Match Game 🎴
 A simple and fun memory card matching game built with HTML, CSS, and JavaScript.
-How to Play
+How to Play?
 
 Click any card to flip it over
 Click a second card to find its match
