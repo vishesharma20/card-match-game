@@ -25,7 +25,7 @@ Play the game here
 
 https://vishesharma20.github.io/card-match-game/
 
-How to Run Locally
+How to Run Locally?
 
 Download or clone this repository
 Open index.html in any browser
